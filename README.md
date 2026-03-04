@@ -1,1 +1,1 @@
-# estival_platform
+# festival_platform
