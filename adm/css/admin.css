@@ -104,6 +104,8 @@ h2{font-size: 1.083em;font-weight: bold;margin:10px 0}
 #gnb .on .btn_op.menu-400{background:url(../img/menu-7.png) 50% 50% no-repeat #fff}
 #gnb .gnb_li .btn_op.menu-500{background:url(../img/menu-6-1.png) 50% 50% no-repeat #ebebeb }
 #gnb .on .btn_op.menu-500{background:url(../img/menu-6.png) 50% 50% no-repeat #fff}
+/* 800번대(주차장/행사 관리) 메뉴 아이콘: 자동차 모양 */
+#gnb .gnb_li .btn_op.menu-800::before { content: "\f1b9"; }
 #gnb .gnb_li .btn_op.menu-900{background:url(../img/menu-4-1.png) 50% 50% no-repeat #ebebeb }
 #gnb .on .btn_op.menu-900{background:url(../img/menu-4.png) 50% 50% no-repeat #fff}
 #gnb .gnb_li button:hover{background-color:#f3f3f3}
