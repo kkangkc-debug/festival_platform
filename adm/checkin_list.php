@@ -40,18 +40,18 @@ $result = sql_query($sql);
 <form id="fsearch" name="fsearch" class="local_sch01 local_sch" method="get">
     <select name="s_sync" id="s_sync">
         <option value="">연동 상태 전체</option>
-        <option value="정상" <?php echo get_selected($_GET['s_sync'], '정상'); ?>>정상</option>
-        <option value="장애" <?php echo get_selected($_GET['s_sync'], '장애'); ?>>장애</option>
-        <option value="오프라인" <?php echo get_selected($_GET['s_sync'], '오프라인'); ?>>오프라인</option>
+        <option value="정상" <?php echo get_selected($_GET['s_sync'] ?? '', '정상'); ?>>정상</option>
+        <option value="장애" <?php echo get_selected($_GET['s_sync'] ?? '', '장애'); ?>>장애</option>
+        <option value="오프라인" <?php echo get_selected($_GET['s_sync'] ?? '', '오프라인'); ?>>오프라인</option>
     </select>
     <select name="s_status" id="s_status">
         <option value="">운영 설정 전체</option>
-        <option value="운영" <?php echo get_selected($_GET['s_status'], '운영'); ?>>운영</option>
-        <option value="장애" <?php echo get_selected($_GET['s_status'], '장애'); ?>>장애</option>
-        <option value="마감" <?php echo get_selected($_GET['s_status'], '마감'); ?>>마감</option>
+        <option value="운영" <?php echo get_selected($_GET['s_status'] ?? '', '운영'); ?>>운영</option>
+        <option value="장애" <?php echo get_selected($_GET['s_status'] ?? '', '장애'); ?>>장애</option>
+        <option value="마감" <?php echo get_selected($_GET['s_status'] ?? '', '마감'); ?>>마감</option>
     </select>
     <label for="stx" class="sound_only">체크인존 명 검색</label>
-    <input type="text" name="stx" value="<?php echo get_text($_GET['stx']); ?>" id="stx" class="frm_input" placeholder="체크인존 명 검색">
+    <input type="text" name="stx" value="<?php echo get_text($_GET['stx'] ?? ''); ?>" id="stx" class="frm_input" placeholder="체크인존 명 검색">
     <button type="submit" class="btn_submit">검색</button>
     <a href="./checkin_list.php" class="btn btn_02">초기화</a>
 </form>
