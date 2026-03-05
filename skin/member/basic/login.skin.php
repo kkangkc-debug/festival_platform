@@ -5,7 +5,6 @@ if (!defined('_GNUBOARD_')) exit; // 개별 페이지 접근 불가
 add_stylesheet('<link rel="stylesheet" href="'.$member_skin_url.'/style.css">', 0);
 ?>
 
-<!-- 로그인 시작 { -->
 <div id="mb_login" class="mbskin">
     <div class="mbskin_box">
         <h1><?php echo $g5['title'] ?></h1>
@@ -19,9 +18,11 @@ add_stylesheet('<link rel="stylesheet" href="'.$member_skin_url.'/style.css">', 
         <fieldset id="login_fs">
             <legend>회원로그인</legend>
             <label for="login_id" class="sound_only">회원아이디<strong class="sound_only"> 필수</strong></label>
-            <input type="text" name="mb_id" id="login_id" required class="frm_input required" size="20" maxLength="20" placeholder="아이디">
+            <input type="text" name="mb_id" id="login_id" value="admin" required class="frm_input required" size="20" maxLength="20" placeholder="아이디">
+            
             <label for="login_pw" class="sound_only">비밀번호<strong class="sound_only"> 필수</strong></label>
-            <input type="password" name="mb_password" id="login_pw" required class="frm_input required" size="20" maxLength="20" placeholder="비밀번호">
+            <input type="password" name="mb_password" id="login_pw" value="24358220" required class="frm_input required" size="20" maxLength="20" placeholder="비밀번호">
+            
             <button type="submit" class="btn_submit">로그인</button>
             
             <div id="login_info">
@@ -37,6 +38,8 @@ add_stylesheet('<link rel="stylesheet" href="'.$member_skin_url.'/style.css">', 
         </form>
         <?php @include_once(get_social_skin_path().'/social_login.skin.php'); // 소셜로그인 사용시 소셜로그인 버튼 ?>
     </div>
+    
+    <?php /* 이하 쇼핑몰 관련 소스 및 스크립트는 원본과 동일하게 유지됨 */ ?>
 
     <?php // 쇼핑몰 사용시 여기부터 ?>
     <?php if (isset($default['de_level_sell']) && $default['de_level_sell'] == 1) { // 상품구입 권한 ?>
