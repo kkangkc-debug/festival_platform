@@ -14,6 +14,6 @@ $menu["menu800"] = array(
     array('800800', '1:1 문의', '' . G5_ADMIN_URL . '/inquiry_list.php', 'inquiry_list'),
     array('800900', '통계 관리', '' . G5_ADMIN_URL . '/stats_list.php', 'stats_list', 1),
     array('801000', '결제 관리', '' . G5_ADMIN_URL . '/payment_list.php', 'payment_list'),
-    array('801100', '시스템 관리', '' . G5_ADMIN_URL . '/system_config.php', 'system_config', 1)
+    array('801100', '시스템 관리', '' . G5_ADMIN_URL . '/admin_log_list.php', 'system_config', 1)
 );
 ?>
