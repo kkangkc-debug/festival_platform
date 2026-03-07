@@ -1,6 +1,27 @@
 <?php
 $sub_menu = '100000';
-require_once './_common.php';
+include_once('./_common.php');
+
+// ======================================================================
+// [SaaS Custom] 권한별 관리자 메인화면 자동 리다이렉트 (유령 화면 방지)
+// ======================================================================
+if ($is_admin != 'super') {
+    // 1. 행사 총괄관리자 (Lv.8) -> 현장 자산 관리(주차장 목록)으로 자동 이동
+    if (defined('MY_FS_ID') && MY_FS_ID > 0 && $member['mb_level'] == 8) {
+        goto_url(G5_ADMIN_URL.'/rain_parking_list.php');
+    }
+    // 2. 현장 스태프 (Lv.7) -> 주차 현장 POS 화면으로 자동 이동
+    else if ($member['mb_level'] == 7) {
+        goto_url(G5_ADMIN_URL.'/rain_parking_staff_pos.php');
+    }
+    // 3. 그 외 권한이 애매한 경우 사이트 메인으로 튕겨냄 (보안)
+    else {
+        alert('접근 가능한 관리자 메뉴가 없습니다.', G5_URL);
+    }
+}
+// ======================================================================
+
+include_once(G5_ADMIN_PATH.'/admin.head.php');
 
 @require_once './safe_check.php';
 
