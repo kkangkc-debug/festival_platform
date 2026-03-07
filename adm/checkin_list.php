@@ -13,24 +13,33 @@ $stx = isset($_GET['stx']) ? clean_xss_tags($_GET['stx']) : '';
 
 $sql_search = " WHERE 1=1 ";
 
+// =======================================================
+// [SaaS 핵심 격리 로직]
+// MY_FS_ID가 0보다 크면 무조건 자신의 행사 체크인존만 보이게 강제 필터링
+// =======================================================
+if (defined('MY_FS_ID') && MY_FS_ID > 0) {
+    $sql_search .= " AND c.fs_id = '" . MY_FS_ID . "' ";
+}
+
 // 텍스트 검색
 if ($stx) {
-    $sql_search .= " and ci_name like '%{$stx}%' ";
+    $sql_search .= " and c.ci_name like '%{$stx}%' ";
 }
 
 // 연동 상태 다중 필터 (선택된 값 중 하나라도 포함되면 노출)
 if (!empty($s_sync)) {
     $sync_str = implode("','", $s_sync);
-    $sql_search .= " and ci_sync_status IN ('{$sync_str}') ";
+    $sql_search .= " and c.ci_sync_status IN ('{$sync_str}') ";
 }
 
 // 운영 설정 다중 필터 (선택된 값 중 하나라도 포함되면 노출)
 if (!empty($s_status)) {
     $status_str = implode("','", $s_status);
-    $sql_search .= " and ci_status IN ('{$status_str}') ";
+    $sql_search .= " and c.ci_status IN ('{$status_str}') ";
 }
 
-$sql_common = " from rain_checkin_info " . $sql_search;
+// [수정] rain_festival 테이블과 조인하여 행사명(fs_name)을 가져옵니다.
+$sql_common = " from rain_checkin_info c left join rain_festival f on c.fs_id = f.fs_id " . $sql_search;
 
 $sql = " select count(*) as cnt " . $sql_common;
 $row = sql_fetch($sql);
@@ -42,7 +51,8 @@ $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 if ($page < 1) $page = 1;
 $from_record = ($page - 1) * $rows;
 
-$sql = " select * $sql_common order by ci_id desc limit $from_record, $rows ";
+// [수정] 조인된 필드를 포함하여 데이터를 가져옵니다.
+$sql = " select c.*, f.fs_name $sql_common order by c.ci_id desc limit $from_record, $rows ";
 $result = sql_query($sql);
 
 // 페이지 이동 시 검색어 유지를 위한 qstr 처리
@@ -57,11 +67,9 @@ foreach ($s_status as $val) {
 <div class="local_desc01 local_desc">
     <p><strong>[체크인존 관리 목록 화면 이용 안내]</strong></p>
     <ul style="margin-top:10px; line-height:1.8em;">
-        <li><strong>권한:</strong> 축제 운영 관리자 전용 메뉴입니다. (+ 체크인존 등록 권한이 없는 경우 등록 버튼이 노출되지 않습니다.)</li>
-        <li><strong>검색 및 필터:</strong> 연동 상태(정상/장애/오프라인) 및 운영 설정(운영중/장애/마감)을 체크박스로 다중 선택하여 조건에 맞는 목록을 조회할 수 있습니다.</li>
-        <li><strong>연동 상태:</strong> 행사 체크인 시 QR 코드 확인 기기의 동작 상태를 나타냅니다.</li>
-        <li><strong>당일 입장객 수:</strong> 해당 체크인존을 통해 입장 완료 처리된 QR 기준 인원 합계입니다. <strong>(재입장 시에도 신규 입장으로 집계)</strong></li>
-        <li><strong>사용자 노출:</strong> '미노출' 설정 시 사용자 페이지에서 해당 체크인존이 표출되지 않습니다.</li>
+        <li><strong>권한:</strong> 축제 운영 관리자 전용 메뉴입니다. 소속된 행사의 체크인존만 노출됩니다.</li>
+        <li><strong>검색 및 필터:</strong> 연동 상태 및 운영 설정을 체크박스로 다중 선택하여 조건에 맞는 목록을 조회할 수 있습니다.</li>
+        <li><strong>당일 입장객 수:</strong> 해당 체크인존을 통해 입장 완료 처리된 실시간 인원 합계입니다.</li>
     </ul>
 </div>
 
@@ -99,6 +107,9 @@ foreach ($s_status as $val) {
         <thead>
         <tr>
             <th scope="col">번호</th>
+            <?php if ($is_admin == 'super') { ?>
+            <th scope="col">소속 행사</th>
+            <?php } ?>
             <th scope="col">체크인존 명</th>
             <th scope="col">위치</th>
             <th scope="col">연동상태</th>
@@ -114,19 +125,20 @@ foreach ($s_status as $val) {
         for ($i=0; $row=sql_fetch_array($result); $i++) {
             $bg = 'bg'.($i%2);
             
-            // 연동 상태 색상 클래스 디자인 (기획서 시각화 반영)
             if($row['ci_sync_status'] == '장애') {
                 $sync_cls = 'background:#fe528f; color:#fff; display:inline-block; padding:3px 10px; border-radius:3px; font-size:0.92em; font-weight:bold;';
             } else if($row['ci_sync_status'] == '정상') {
                 $sync_cls = 'background:#68d0a7; color:#fff; display:inline-block; padding:3px 10px; border-radius:3px; font-size:0.92em; font-weight:bold;';
             } else {
-                // 오프라인 등
                 $sync_cls = 'background:#888; color:#fff; display:inline-block; padding:3px 10px; border-radius:3px; font-size:0.92em; font-weight:bold;';
             }
         ?>
         <tr class="<?php echo $bg; ?>">
             <td><?php echo $total_count - ($page - 1) * $rows - $i; ?></td>
-            <td class="td_left"><?php echo get_text($row['ci_name']); ?></td>
+            <?php if ($is_admin == 'super') { ?>
+            <td><?php echo $row['fs_name'] ? get_text($row['fs_name']) : '<span style="color:#ccc;">미지정</span>'; ?></td>
+            <?php } ?>
+            <td class="td_left" style="font-weight:bold;"><?php echo get_text($row['ci_name']); ?></td>
             <td class="td_left"><?php echo get_text($row['ci_location']); ?></td>
             <td><span style="<?php echo $sync_cls; ?>"><?php echo $row['ci_sync_status']; ?></span></td>
             <td><strong><?php echo number_format($row['ci_today_visitors']); ?></strong></td>
@@ -143,7 +155,7 @@ foreach ($s_status as $val) {
                 <a href="./checkin_view.php?ci_id=<?php echo $row['ci_id']; ?>&amp;<?php echo $qstr; ?>" class="btn btn_03">상세</a>
             </td>
         </tr>
-        <?php } if ($i == 0) { echo '<tr><td colspan="9" class="empty_table">등록된 체크인존 자료가 없습니다.</td></tr>'; } ?>
+        <?php } if ($i == 0) { echo '<tr><td colspan="'.($is_admin == 'super' ? '10' : '9').'" class="empty_table">등록된 체크인존 자료가 없습니다.</td></tr>'; } ?>
         </tbody>
     </table>
 </div>

@@ -51,6 +51,24 @@ include_once('./admin.head.php');
         <caption><?php echo $g5['title']; ?></caption>
         <colgroup><col class="grid_4"><col></colgroup>
         <tbody>
+
+        <tr>
+            <th scope="row"><label for="fs_id">행사 소속 지정</label></th>
+            <td>
+                <select name="fs_id" id="fs_id" class="frm_input">
+                    <option value="0">-- 소속 없음 (전체 공용) --</option>
+                    <?php
+                    // 개설된 행사 목록 불러오기
+                    $fs_res = sql_query("SELECT fs_id, fs_name FROM rain_festival ORDER BY fs_id DESC");
+                    while ($fs = sql_fetch_array($fs_res)) {
+                        $selected = ($fs['fs_id'] == $row['fs_id']) ? 'selected' : '';
+                        echo '<option value="'.$fs['fs_id'].'" '.$selected.'>'.get_text($fs['fs_name']).'</option>';
+                    }
+                    ?>
+                </select>
+                <span class="frm_info">최고관리자 전용 설정입니다. 주차장이 소속될 행사를 지정해 주세요.</span>
+            </td>
+        </tr>
         <tr><td colspan="2" class="h2_frm">기본 정보</td></tr>
         <tr>
             <th scope="row"><label for="pi_name">주차장 명<strong class="sound_only">필수</strong></label></th>

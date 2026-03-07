@@ -14,6 +14,7 @@ if ($w == 'u') {
 } else {
     $html_title = '체크인존 등록';
     $row = array(
+        'fs_id' => defined('MY_FS_ID') ? MY_FS_ID : 0,
         'ci_name' => '',
         'ci_location' => '',
         'ci_manager_name' => '',
@@ -44,6 +45,26 @@ include_once('./admin.head.php');
         <caption><?php echo $g5['title']; ?></caption>
         <colgroup><col class="grid_4"><col></colgroup>
         <tbody>
+
+        <?php if ($is_admin == 'super') { ?>
+        <tr>
+            <th scope="row"><label for="fs_id" style="color:#ff3061;">[SaaS] 행사 소속</label></th>
+            <td>
+                <select name="fs_id" id="fs_id" class="frm_input">
+                    <option value="0">-- 소속 없음 (공용/미지정) --</option>
+                    <?php
+                    $fs_res = sql_query("SELECT fs_id, fs_name FROM rain_festival ORDER BY fs_id DESC");
+                    while ($fs = sql_fetch_array($fs_res)) {
+                        $selected = ($fs['fs_id'] == $row['fs_id']) ? 'selected' : '';
+                        echo '<option value="'.$fs['fs_id'].'" '.$selected.'>'.get_text($fs['fs_name']).'</option>';
+                    }
+                    ?>
+                </select>
+                <span class="frm_info">최고관리자 전용 설정입니다. 이 체크인존이 소속될 행사를 지정해 주세요.</span>
+            </td>
+        </tr>
+        <?php } ?>
+
         <tr><td colspan="2" class="h2_frm">기본 정보</td></tr>
         <tr>
             <th scope="row"><label for="ci_name">체크인존 명<strong class="sound_only">필수</strong></label></th>
@@ -134,7 +155,6 @@ include_once('./admin.head.php');
 function execDaumPostcode() {
     new daum.Postcode({
         oncomplete: function(data) {
-            // 도로명 주소를 가져와서 위치 입력란에 넣습니다.
             var addr = data.roadAddress; 
             if(addr === '') {
                 addr = data.jibunAddress;
