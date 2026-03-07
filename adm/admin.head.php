@@ -117,6 +117,39 @@ if (!empty($_COOKIE['g5_admin_btn_gnb'])) {
         <button type="button" id="btn_gnb" class="btn_gnb_close <?php echo $adm_menu_cookie['btn_gnb']; ?>">메뉴</button>
         <div id="logo"><a href="<?php echo correct_goto_url(G5_ADMIN_URL); ?>"><img src="<?php echo G5_ADMIN_URL ?>/img/logo.png" alt="<?php echo get_text($config['cf_title']); ?> 관리자"></a></div>
 
+
+<?php
+        // --- [SaaS 행사 정보 안내판 로직 시작] ---
+        $my_fs_name = "전체 행사 통합 관리 (모든 권한)";
+        $my_fs_period = "-";
+        $my_role_name = ($is_admin == 'super') ? "최고관리자" : "행사관리자";
+
+        // _common.php에서 세팅된 MY_FS_ID를 기반으로 현재 행사 정보를 가져옵니다.
+        if (defined('MY_FS_ID') && MY_FS_ID > 0) {
+            $hd_fs = sql_fetch(" SELECT fs_name, fs_start_date, fs_end_date FROM rain_festival WHERE fs_id = '".MY_FS_ID."' ");
+            if ($hd_fs) {
+                $my_fs_name = get_text($hd_fs['fs_name']);
+                $my_fs_period = $hd_fs['fs_start_date'] . ' ~ ' . $hd_fs['fs_end_date'];
+            }
+        }
+        // --- [SaaS 행사 정보 안내판 로직 끝] ---
+        ?>
+
+        <div style="float:left; margin: 18px 0 0 20px; background:#ff3061; color:#fff; padding:6px 15px; border-radius:5px; font-size:13px; font-weight:bold; letter-spacing:-0.5px; box-shadow:0 2px 4px rgba(255,48,97,0.3);">
+            <i class="fa fa-user" aria-hidden="true" style="margin-right:3px;"></i> 
+            [<?php echo $my_role_name; ?>] <?php echo $member['mb_name']; ?>(<?php echo $member['mb_id']; ?>) 님
+            
+            <span style="display:inline-block; margin:0 10px; width:1px; height:12px; background:rgba(255,255,255,0.4); vertical-align:middle;"></span>
+            
+            <i class="fa fa-flag" aria-hidden="true" style="margin-right:3px;"></i> 
+            현재 관리 행사 : <span style="color:#fff1b0;"><?php echo $my_fs_name; ?></span>
+            
+            <?php if(defined('MY_FS_ID') && MY_FS_ID > 0) { ?>
+                <span style="font-weight:normal; font-size:12px; opacity:0.9; margin-left:5px;">(<?php echo $my_fs_period; ?>)</span>
+            <?php } ?>
+        </div>
+
+
         <div id="tnb">
             <ul>
                 <?php if (defined('G5_USE_SHOP') && G5_USE_SHOP) { ?>
