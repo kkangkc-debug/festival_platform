@@ -206,6 +206,21 @@ if (!empty($_COOKIE['g5_admin_btn_gnb'])) {
     });
 </script>
 
+<script>
+$(function() {
+    // 1. 소스에 맞춰 1차 메뉴 껍데기인 .gnb_li 를 순회합니다.
+    $('.gnb_li').each(function() {
+        // 2. 그 안의 2차 메뉴(gnb_oparea 안의 li 태그) 개수를 셉니다.
+        var subMenuCount = $(this).find('.gnb_oparea li').length;
+        
+        // 3. 하위 메뉴가 단 1개도 없다면 1차 메뉴를 쿨하게 숨깁니다.
+        if (subMenuCount === 0) {
+            $(this).hide();
+        }
+    });
+});
+</script>
+
 
 <div id="wrapper">
 

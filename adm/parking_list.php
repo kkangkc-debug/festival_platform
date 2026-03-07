@@ -11,10 +11,20 @@ $s_type = isset($_GET['s_type']) && is_array($_GET['s_type']) ? array_map('clean
 $s_cong = isset($_GET['s_cong']) && is_array($_GET['s_cong']) ? array_map('clean_xss_tags', $_GET['s_cong']) : array();
 $stx = isset($_GET['stx']) ? clean_xss_tags($_GET['stx']) : '';
 
+// [기존 코드]
 $sql_search = " WHERE 1=1 ";
 if ($stx) {
     $sql_search .= " and pi_name like '%{$stx}%' ";
 }
+
+// =======================================================
+// [신규 추가] SaaS 데이터 격리 로직 
+// (MY_FS_ID가 0보다 크면 무조건 해당 행사 데이터만 조회)
+// =======================================================
+if (defined('MY_FS_ID') && MY_FS_ID > 0) {
+    $sql_search .= " AND fs_id = '" . MY_FS_ID . "' ";
+}
+// =======================================================
 
 // 주차 유형 (AND 검색: 체크한 유형을 모두 만족하는 데이터)
 if (in_array('일반', $s_type)) {
