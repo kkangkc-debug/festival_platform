@@ -53,6 +53,7 @@ foreach ($s_status as $val) { $qstr .= "&amp;s_status[]=".urlencode($val); }
     <ul>
         <li><strong>권한:</strong> 소속된 행사의 체험부스만 노출되며 관리할 수 있습니다.</li>
         <li><strong>상태:</strong> 운영(초록) / 점검(노랑) / 마감(회색)으로 현장 상태를 직관적으로 파악할 수 있습니다.</li>
+        <li><strong>URL 복사:</strong> 버튼을 눌러 해당 체험부스의 모바일 관리(POS) 화면 주소를 담당자에게 전달하세요.</li>
     </ul>
 </div>
 
@@ -103,6 +104,9 @@ foreach ($s_status as $val) { $qstr .= "&amp;s_status[]=".urlencode($val); }
             } else {
                 $status_cls = 'background:#68d0a7; color:#fff; display:inline-block; padding:3px 10px; border-radius:3px; font-size:0.92em; font-weight:bold;';
             }
+            
+            // [추가] 부스 전용 POS URL 세팅
+            $pos_url = G5_ADMIN_URL.'/rain_booth_staff_pos.php?bt_id='.$row['bt_id'];
         ?>
         <tr class="<?php echo $bg; ?>">
             <td><?php echo $total_count - ($page - 1) * $rows - $i; ?></td>
@@ -118,6 +122,7 @@ foreach ($s_status as $val) { $qstr .= "&amp;s_status[]=".urlencode($val); }
                 <?php echo $row['bt_is_show'] ? '<span style="color:#2CC185;">● 노출</span>' : '<span style="color:#ccc;">● 미노출</span>'; ?>
             </td>
             <td class="td_mng td_mng_s">
+                <button type="button" onclick="rainCopyUrl('<?php echo $pos_url; ?>')" class="btn btn_03" style="background:#009688; border-color:#009688; color:#fff;">URL 복사</button>
                 <a href="./rain_booth_form.php?w=u&amp;bt_id=<?php echo $row['bt_id']; ?>&amp;<?php echo $qstr; ?>" class="btn btn_03">수정</a>
             </td>
         </tr>
@@ -129,6 +134,20 @@ foreach ($s_status as $val) { $qstr .= "&amp;s_status[]=".urlencode($val); }
 <div class="btn_fixed_top">
     <a href="./rain_booth_form.php" class="btn btn_01">+ 체험부스 등록</a>
 </div>
+
+<script>
+function rainCopyUrl(url) {
+    var tempInput = document.createElement("textarea");
+    document.body.appendChild(tempInput);
+    tempInput.value = url;
+    tempInput.select();
+    tempInput.setSelectionRange(0, 9999); /* 모바일 대응 */
+    document.execCommand("copy");
+    document.body.removeChild(tempInput);
+    
+    alert("담당자에게 전달할 접속 URL이 복사되었습니다.\n\n" + url);
+}
+</script>
 
 <?php echo get_paging(G5_IS_MOBILE ? $config['cf_mobile_pages'] : $config['cf_write_pages'], $page, $total_page, '?'.$qstr.'&amp;page='); ?>
 <?php include_once('./admin.tail.php'); ?>

@@ -1,11 +1,12 @@
 <?php
-include_once('./_common.php');
+// [수정1] 관리자 폴더의 _common.php가 아닌, 최상위 common.php를 호출하여 관리자 강제 차단 우회
+include_once('../common.php');
 
 header('Content-Type: application/json; charset=utf-8');
 
-// 권한 확인 (Lv.7 이상)
-if ($member['mb_level'] < 7) {
-    echo json_encode(['success' => false, 'error' => '권한이 없습니다.']);
+// 로그인 여부 확인
+if ($is_guest) {
+    echo json_encode(['success' => false, 'error' => '로그인이 필요합니다.']);
     exit;
 }
 
@@ -17,13 +18,39 @@ if (!$pi_id || !$action) {
     exit;
 }
 
+// =========================================================================
+// [수정2] 레벨(Lv.7) 강제 제한 대신, 실제 배정(Mapping) 여부로 권한 검증!
+// =========================================================================
+$has_auth = false;
+
+if ($is_admin == 'super') {
+    // 1. 최고관리자 패스
+    $has_auth = true;
+} else if ($member['mb_level'] >= 8 && defined('MY_FS_ID')) {
+    // 2. 행사관리자(Lv.8) - 본인 행사의 주차장인지 확인 후 패스
+    $chk = sql_fetch(" SELECT pi_id FROM rain_park_info WHERE pi_id = '{$pi_id}' AND fs_id = '".MY_FS_ID."' ");
+    if (isset($chk['pi_id']) && $chk['pi_id']) $has_auth = true;
+} else {
+    // 3. 일반 스태프 (레벨 무관, DB에 해당 주차장 번호로 매핑되어 있는지 확인)
+    $mapping = sql_fetch(" SELECT target_id FROM rain_festival_manager 
+                           WHERE mb_id = '{$member['mb_id']}' AND role_type = 'PARKING_STAFF' AND target_id = '{$pi_id}' ");
+    if (isset($mapping['target_id']) && $mapping['target_id']) $has_auth = true;
+}
+
+// 권한이 없으면 여기서 차단
+if (!$has_auth) {
+    echo json_encode(['success' => false, 'error' => '해당 주차장을 제어할 권한이 없습니다.']);
+    exit;
+}
+// =========================================================================
+
+
 // -------------------------------------------------------------------------
-// 1. [구버전 호환] 전체 주차 카운트 단순 증감 (사용 안 할 수도 있음)
+// 1. [구버전 호환] 전체 주차 카운트 단순 증감
 // -------------------------------------------------------------------------
 if ($action == 'rain_count') {
     $val = (int)$_POST['val'];
     
-    // 음수가 되지 않도록 방어 (GREATEST 함수)
     $sql = " UPDATE rain_park_info 
              SET pi_current_parked = GREATEST(0, pi_current_parked + {$val}) 
              WHERE pi_id = '{$pi_id}' ";
@@ -46,7 +73,6 @@ if ($action == 'rain_count_type') {
     $val = (int)$_POST['val'];
     
     $col = '';
-    // 전달받은 type 값에 따라 실제 DB 컬럼 매칭
     if ($type == 'general') $col = 'pi_parked_general';
     else if ($type == 'barrier') $col = 'pi_parked_barrier';
     else if ($type == 'large') $col = 'pi_parked_large';
