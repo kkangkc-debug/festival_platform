@@ -33,7 +33,9 @@ if ($w == '') {
     // 필요 시 개설 직후 알림 로직 추가 가능
 } else if ($w == 'u') {
     // 정보 수정
-    $fs_id = (int)$POST['fs_id'];
+    // [수정] $POST['fs_id'] 를 $_POST['fs_id'] 로 변경
+    $fs_id = (int)$_POST['fs_id']; 
+    
     $sql = " UPDATE rain_festival
                 $sql_common
                 WHERE fs_id = '{$fs_id}' ";
@@ -42,5 +44,5 @@ if ($w == '') {
     alert('잘못된 접근입니다.');
 }
 
-goto_url('./festival_list.php?'.$qstr);
+goto_url('./rain_festival_list.php?'.$qstr);
 ?>

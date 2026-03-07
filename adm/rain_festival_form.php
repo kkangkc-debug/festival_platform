@@ -30,7 +30,7 @@ $g5['title'] = $html_title;
 include_once('./admin.head.php');
 ?>
 
-<form name="ffestivalform" id="ffestivalform" action="./festival_form_update.php" method="post" autocomplete="off">
+<form name="ffestivalform" id="ffestivalform" action="./rain_festival_form_update.php" method="post" autocomplete="off">
 <input type="hidden" name="w" value="<?php echo $w; ?>">
 <input type="hidden" name="fs_id" value="<?php echo $fs_id; ?>">
 <input type="hidden" name="token" value="<?php echo get_admin_token(); ?>">
@@ -68,7 +68,7 @@ include_once('./admin.head.php');
 </div>
 
 <div class="btn_fixed_top">
-    <a href="./festival_list.php?<?php echo $qstr; ?>" class="btn btn_02">취소(목록)</a>
+    <a href="./rain_festival_list.php?<?php echo $qstr; ?>" class="btn btn_02">취소(목록)</a>
     <input type="submit" value="<?php echo $w=='u'?'수정완료':'개설완료'; ?>" class="btn_submit btn" accesskey="s">
 </div>
 </form>

@@ -36,6 +36,21 @@ $g5['title'] = $html_title;
 include_once('./admin.head.php');
 ?>
 
+
+<?php if ($w == 'u') { // 수정 모드일 때만 탭 표시 ?>
+<style>
+.rain_rt_tabs { border-bottom: 2px solid #ddd; margin-bottom: 20px; display: flex; gap: 5px; }
+.rain_rt_tabs a { padding: 10px 30px; background: #f5f5f5; color: #555; text-decoration: none; border-radius: 8px 8px 0 0; font-weight: bold; border: 1px solid #ddd; border-bottom: none; }
+.rain_rt_tabs a.active { background: #fff; color: #3f51b5; border-top: 2px solid #3f51b5; padding-bottom: 12px; margin-bottom: -2px; }
+</style>
+<div class="rain_rt_tabs">
+    <a href="./rain_restaurant_form.php?w=u&rt_id=<?php echo $rt_id; ?>" class="active">기본 정보</a>
+    <a href="./rain_restaurant_menu.php?rt_id=<?php echo $rt_id; ?>">메뉴 관리</a>
+    <a href="./rain_restaurant_order.php?rt_id=<?php echo $rt_id; ?>">주문 내역</a>
+    <a href="./rain_restaurant_stat.php?rt_id=<?php echo $rt_id; ?>">통계</a>
+</div>
+<?php } ?>
+
 <form name="frestform" id="frestform" action="./rain_restaurant_form_update.php" method="post" autocomplete="off">
 <input type="hidden" name="w" value="<?php echo $w; ?>">
 <input type="hidden" name="rt_id" value="<?php echo $rt_id; ?>">

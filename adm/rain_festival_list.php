@@ -66,7 +66,7 @@ $result = sql_query($sql);
         <td class="td_mng"><?php echo $row['fs_status']; ?></td>
         <td class="td_date"><?php echo substr($row['fs_datetime'], 0, 10); ?></td>
         <td class="td_mng td_mng_s">
-            <a href="./festival_form.php?w=u&amp;fs_id=<?php echo $row['fs_id']; ?>&amp;<?php echo $qstr; ?>" class="btn btn_03">수정</a>
+            <a href="./rain_festival_form.php?w=u&amp;fs_id=<?php echo $row['fs_id']; ?>&amp;<?php echo $qstr; ?>" class="btn btn_03">수정</a>
         </td>
     </tr>
     <?php } if ($i == 0) { echo '<tr><td colspan="6" class="empty_table">개설된 행사가 없습니다.</td></tr>'; } ?>
@@ -75,7 +75,7 @@ $result = sql_query($sql);
 </div>
 
 <div class="btn_fixed_top">
-    <a href="./festival_form.php" class="btn btn_01">+ 새 행사 개설</a>
+    <a href="./rain_festival_form.php" class="btn btn_01">+ 새 행사 개설</a>
 </div>
 
 <?php echo get_paging(G5_IS_MOBILE ? $config['cf_mobile_pages'] : $config['cf_write_pages'], $page, $total_page, '?'.$qstr.'&amp;page='); ?>
