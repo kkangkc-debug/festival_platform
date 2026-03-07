@@ -105,8 +105,8 @@ include_once('./admin.head.php');
 </div>
 
 <div class="btn_fixed_top">
-    <a href="./checkin_list.php?<?php echo $qstr; ?>" class="btn btn_02">목록으로</a>
-    <a href="./checkin_form.php?w=u&amp;ci_id=<?php echo $ci_id; ?>&amp;<?php echo $qstr; ?>" class="btn btn_01">정보 수정</a>
+    <a href="./rain_checkin_list.php?<?php echo $qstr; ?>" class="btn btn_02">목록으로</a>
+    <a href="./rain_checkin_form.php?w=u&amp;ci_id=<?php echo $ci_id; ?>&amp;<?php echo $qstr; ?>" class="btn btn_01">정보 수정</a>
 </div>
 
 <?php include_once('./admin.tail.php'); ?>

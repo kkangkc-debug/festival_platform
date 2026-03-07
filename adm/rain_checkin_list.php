@@ -152,7 +152,7 @@ foreach ($s_status as $val) {
                 <?php } ?>
             </td>
             <td class="td_mng td_mng_s">
-                <a href="./checkin_view.php?ci_id=<?php echo $row['ci_id']; ?>&amp;<?php echo $qstr; ?>" class="btn btn_03">상세</a>
+                <a href="./rain_checkin_view.php?ci_id=<?php echo $row['ci_id']; ?>&amp;<?php echo $qstr; ?>" class="btn btn_03">상세</a>
             </td>
         </tr>
         <?php } if ($i == 0) { echo '<tr><td colspan="'.($is_admin == 'super' ? '10' : '9').'" class="empty_table">등록된 체크인존 자료가 없습니다.</td></tr>'; } ?>
@@ -161,7 +161,7 @@ foreach ($s_status as $val) {
 </div>
 
 <div class="btn_fixed_top">
-    <a href="./checkin_form.php" class="btn btn_01">+ 체크인존 등록</a>
+    <a href="./rain_checkin_form.php" class="btn btn_01">+ 체크인존 등록</a>
 </div>
 
 <?php echo get_paging(G5_IS_MOBILE ? $config['cf_mobile_pages'] : $config['cf_write_pages'], $page, $total_page, '?'.$qstr.'&amp;page='); ?>

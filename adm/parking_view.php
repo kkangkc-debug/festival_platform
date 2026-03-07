@@ -153,8 +153,8 @@ include_once('./admin.head.php');
 </form>
 
 <div class="btn_fixed_top">
-    <a href="./rain_parking_list.php?<?php echo $qstr; ?>" class="btn btn_02">목록</a>
-    <a href="./rain_parking_form.php?w=u&amp;pi_id=<?php echo $pi_id; ?>&amp;<?php echo $qstr; ?>" class="btn btn_01">수정하기</a>
+    <a href="./parking_list.php?<?php echo $qstr; ?>" class="btn btn_02">목록</a>
+    <a href="./parking_form.php?w=u&amp;pi_id=<?php echo $pi_id; ?>&amp;<?php echo $qstr; ?>" class="btn btn_01">수정하기</a>
 </div>
 
 <?php include_once('./admin.tail.php'); ?>

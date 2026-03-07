@@ -11,16 +11,10 @@ if ($w == 'u') {
     $sql = " select * from rain_park_info where pi_id = '{$pi_id}' ";
     $row = sql_fetch($sql);
     if (!$row['pi_id']) alert('존재하지 않는 자료입니다.');
-    
-    // 행사관리자(Lv.8)인 경우 타 행사의 주차장 접근 차단
-    if ($is_admin != 'super' && defined('MY_FS_ID') && MY_FS_ID > 0) {
-        if ($row['fs_id'] != MY_FS_ID) alert('접근 권한이 없는 주차장입니다.');
-    }
 } else {
     $html_title = '주차장 등록';
     // [오류 수정] Undefined array key 방지를 위해 폼에서 호출하는 모든 초기값을 명시함
     $row = array(
-        'fs_id' => defined('MY_FS_ID') ? MY_FS_ID : 0,
         'pi_name' => '', 
         'pi_location' => '', 
         'pi_type_general' => 0, 
@@ -43,14 +37,10 @@ $g5['title'] = $html_title;
 include_once('./admin.head.php');
 ?>
 
-<form name="fparkingform" id="fparkingform" action="./rain_parking_form_update.php" method="post" autocomplete="off">
+<form name="fparkingform" id="fparkingform" action="./parking_form_update.php" method="post" autocomplete="off">
 <input type="hidden" name="w" value="<?php echo $w; ?>">
 <input type="hidden" name="pi_id" value="<?php echo $pi_id; ?>">
 <input type="hidden" name="token" value="<?php echo get_admin_token(); ?>">
-
-<?php if ($is_admin != 'super') { ?>
-<input type="hidden" name="fs_id" value="<?php echo defined('MY_FS_ID') ? MY_FS_ID : 0; ?>">
-<?php } ?>
 
 <div class="local_desc01 local_desc">
     <p>아래 정보를 입력해주세요.</p>
@@ -62,7 +52,6 @@ include_once('./admin.head.php');
         <colgroup><col class="grid_4"><col></colgroup>
         <tbody>
 
-        <?php if ($is_admin == 'super') { ?>
         <tr>
             <th scope="row"><label for="fs_id">행사 소속 지정</label></th>
             <td>
@@ -80,8 +69,6 @@ include_once('./admin.head.php');
                 <span class="frm_info">최고관리자 전용 설정입니다. 주차장이 소속될 행사를 지정해 주세요.</span>
             </td>
         </tr>
-        <?php } ?>
-        
         <tr><td colspan="2" class="h2_frm">기본 정보</td></tr>
         <tr>
             <th scope="row"><label for="pi_name">주차장 명<strong class="sound_only">필수</strong></label></th>
@@ -182,7 +169,7 @@ include_once('./admin.head.php');
 </div>
 
 <div class="btn_fixed_top">
-    <a href="./rain_parking_list.php" class="btn btn_02">취소(목록)</a>
+    <a href="./parking_list.php" class="btn btn_02">취소(목록)</a>
     <input type="submit" value="<?php echo $w=='u'?'수정완료':'등록'; ?>" class="btn_submit btn" accesskey="s">
 </div>
 </form>

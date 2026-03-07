@@ -15,8 +15,6 @@ $sql_search = " WHERE 1=1 ";
 
 // =======================================================
 // [SaaS 핵심 격리 로직]
-// MY_FS_ID가 0보다 크면 무조건 자신의 행사 주차장만 보이게 강제 필터링
-// =======================================================
 if (defined('MY_FS_ID') && MY_FS_ID > 0) {
     $sql_search .= " AND fs_id = '" . MY_FS_ID . "' ";
 }
@@ -25,7 +23,7 @@ if ($stx) {
     $sql_search .= " AND pi_name like '%{$stx}%' ";
 }
 
-// 주차 유형 (AND 검색: 체크한 유형을 모두 만족하는 데이터)
+// 주차 유형 (AND 검색)
 if (in_array('일반', $s_type)) {
     $sql_search .= " AND pi_type_general = 1 ";
 }
@@ -36,7 +34,7 @@ if (in_array('대형', $s_type)) {
     $sql_search .= " AND pi_type_large = 1 ";
 }
 
-// 혼잡도 (OR 검색: 체크한 상태 중 하나라도 만족하는 데이터)
+// 혼잡도 (OR 검색)
 if (!empty($s_cong)) {
     $cong_queries = array();
     if (in_array('만차', $s_cong)) {
@@ -57,7 +55,7 @@ if (!empty($s_cong)) {
     }
 }
 
-// 쿼리 조립 (서브쿼리를 통해 동적 계산된 값을 필터링에 사용 + [수정] 행사명 조인)
+// 쿼리 조립 
 $sql_common = " FROM (
     SELECT p.*, f.fs_name, 
            (p.pi_capa_general + p.pi_capa_pregnant + p.pi_capa_compact + p.pi_capa_eco + p.pi_capa_large) as total_capa,
@@ -81,6 +79,7 @@ $sql = " select * $sql_common order by pi_id desc limit $from_record, $rows ";
 $result = sql_query($sql);
 
 // 페이지 이동 시 검색어 유지를 위한 qstr 처리
+$qstr = '';
 foreach ($s_type as $val) {
     $qstr .= "&amp;s_type[]=".urlencode($val);
 }
@@ -130,7 +129,7 @@ foreach ($s_cong as $val) {
         <label for="stx" class="sound_only">주차장 명 검색</label>
         <input type="text" name="stx" value="<?php echo get_text($stx); ?>" id="stx" class="frm_input" placeholder="주차장 명 검색" style="height:30px;">
         <button type="submit" class="btn_submit" title="검색">검색</button>
-        <a href="./parking_list.php" class="btn btn_02" style="height:30px; line-height:30px; display:inline-block; border-radius:3px;">초기화</a>
+        <a href="./rain_parking_list.php" class="btn btn_02" style="height:30px; line-height:30px; display:inline-block; border-radius:3px;">초기화</a>
     </div>
 </form>
 
@@ -143,8 +142,8 @@ foreach ($s_cong as $val) {
             <?php if ($is_admin == 'super') { ?><th scope="col">소속 행사</th><?php } ?>
             <th scope="col">주차장 명</th>
             <th scope="col">위치</th>
-            <th scope="col">주차 유형</th>
-            <th scope="col">주차현황<br><span style="font-weight:normal; font-size:0.9em;">(잔여 대수 / 총 수용 대수)</span></th>
+            <th scope="col">주차 유형별 현황<br><span style="font-weight:normal; font-size:0.9em;">(입차 / 수용)</span></th>
+            <th scope="col">총 주차현황<br><span style="font-weight:normal; font-size:0.9em;">(잔여 / 총수용)</span></th>
             <th scope="col">혼잡도</th>
             <th scope="col">담당자명</th>
             <th scope="col">사용자 노출</th>
@@ -154,13 +153,36 @@ foreach ($s_cong as $val) {
         <tbody>
         <?php
         for ($i=0; $row=sql_fetch_array($result); $i++) {
-            // 주차 유형 배열화
-            $types = array();
-            if($row['pi_type_general']) $types[] = '일반';
-            if($row['pi_type_barrier']) $types[] = '베리어프리';
-            if($row['pi_type_large']) $types[] = '대형';
             
-            // 용량 계산 (서브쿼리에서 계산된 값 활용)
+            // =========================================================
+            // [수정된 부분] 유형별(일반/베리어프리/대형) 숫자 표시 로직
+            // =========================================================
+            $types_html = '';
+            
+            // 일반 주차
+            if($row['pi_type_general']) {
+                $capa_gen = (int)$row['pi_capa_general'];
+                $park_gen = isset($row['pi_parked_general']) ? (int)$row['pi_parked_general'] : 0;
+                $types_html .= "<div style='margin-bottom:3px;'>일반: <span style='font-weight:bold; color:#333;'>{$park_gen}</span> / {$capa_gen}</div>";
+            }
+            
+            // 베리어프리 주차 (임산부+경차+친환경 합산)
+            if($row['pi_type_barrier']) {
+                $capa_bar = (int)$row['pi_capa_pregnant'] + (int)$row['pi_capa_compact'] + (int)$row['pi_capa_eco'];
+                $park_bar = isset($row['pi_parked_barrier']) ? (int)$row['pi_parked_barrier'] : 0;
+                $types_html .= "<div style='margin-bottom:3px; color:#2CC185;'>베리어프리: <span style='font-weight:bold;'>{$park_bar}</span> / {$capa_bar}</div>";
+            }
+            
+            // 대형 주차
+            if($row['pi_type_large']) {
+                $capa_lar = (int)$row['pi_capa_large'];
+                $park_lar = isset($row['pi_parked_large']) ? (int)$row['pi_parked_large'] : 0;
+                $types_html .= "<div style='color:#ffa700;'>대형: <span style='font-weight:bold;'>{$park_lar}</span> / {$capa_lar}</div>";
+            }
+
+            // =========================================================
+            
+            // 총 용량 계산 (서브쿼리에서 계산된 값 활용)
             $total_capa = $row['total_capa'];
             $remain = $row['remain'];
             $rate = ($total_capa > 0) ? ($remain / $total_capa) * 100 : 0;
@@ -183,7 +205,7 @@ foreach ($s_cong as $val) {
                 $cong_cls = 'background:#68d0a7; color:#fff; display:inline-block; padding:3px 10px; border-radius:3px; font-size:0.92em; font-weight:bold;'; 
             }
 
-            // [추가] 소속 행사명 (미지정 처리)
+            // 소속 행사명 (미지정 처리)
             $display_fs_name = $row['fs_name'] ? get_text($row['fs_name']) : '<span style="color:#ccc;">미지정</span>';
 
             $bg = 'bg'.($i%2);
@@ -191,10 +213,16 @@ foreach ($s_cong as $val) {
         <tr class="<?php echo $bg; ?>">
             <td><?php echo $total_count - ($page - 1) * $rows - $i; ?></td>
             <?php if ($is_admin == 'super') { ?><td><?php echo $display_fs_name; ?></td><?php } ?>
-            <td class="td_left"><?php echo get_text($row['pi_name']); ?></td>
+            <td class="td_left"><strong><?php echo get_text($row['pi_name']); ?></strong></td>
             <td class="td_left"><?php echo get_text($row['pi_location']); ?></td>
-            <td><?php echo implode('<br>', $types); ?></td>
-            <td style="font-weight:bold;"><?php echo number_format($remain).' / '.number_format($total_capa); ?></td>
+            
+            <td class="td_left" style="font-size:0.95em; line-height:1.4;">
+                <?php echo $types_html ? $types_html : '<span style="color:#ccc;">설정 안됨</span>'; ?>
+            </td>
+            
+            <td style="font-weight:bold; font-size:1.1em;">
+                <span style="color:#3f51b5;"><?php echo number_format($remain); ?></span> / <?php echo number_format($total_capa); ?>
+            </td>
             <td><span style="<?php echo $cong_cls; ?>"><?php echo $cong_txt; ?></span></td>
             <td><?php echo get_text($row['pi_manager_name']); ?></td>
             <td>
@@ -205,7 +233,8 @@ foreach ($s_cong as $val) {
                 <?php } ?>
             </td>
             <td class="td_mng td_mng_s">
-                <a href="./parking_view.php?pi_id=<?php echo $row['pi_id']; ?>&amp;<?php echo $qstr; ?>" class="btn btn_03">상세</a>
+                <a href="./rain_parking_staff_pos.php?pi_id=<?php echo $row['pi_id']; ?>" target="_blank" class="btn btn_01" style="background:#3f51b5; color:#fff; border-color:#3f51b5;">POS관리</a>
+                <a href="./rain_parking_view.php?pi_id=<?php echo $row['pi_id']; ?>&amp;<?php echo $qstr; ?>" class="btn btn_03">상세</a>
             </td>
         </tr>
         <?php } if ($i == 0) { echo '<tr><td colspan="'.($is_admin == 'super' ? '10' : '9').'" class="empty_table">등록된 주차장 자료가 없습니다.</td></tr>'; } ?>
@@ -214,7 +243,7 @@ foreach ($s_cong as $val) {
 </div>
 
 <div class="btn_fixed_top">
-    <a href="./parking_form.php" class="btn btn_01">+ 주차장 등록</a>
+    <a href="./rain_parking_form.php" class="btn btn_01">+ 주차장 등록</a>
 </div>
 
 <?php echo get_paging(G5_IS_MOBILE ? $config['cf_mobile_pages'] : $config['cf_write_pages'], $page, $total_page, '?'.$qstr.'&amp;page='); ?>

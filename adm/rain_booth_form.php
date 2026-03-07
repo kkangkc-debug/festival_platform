@@ -11,6 +11,12 @@ if ($w == 'u') {
     $sql = " select * from rain_booth_info where bt_id = '{$bt_id}' ";
     $row = sql_fetch($sql);
     if (!$row['bt_id']) alert('존재하지 않는 부스입니다.');
+
+    // [보안 추가] 행사관리자(Lv.8)인 경우 타 행사의 부스 데이터 '열람 자체'를 원천 차단
+    if ($is_admin != 'super' && defined('MY_FS_ID') && MY_FS_ID > 0) {
+        if ($row['fs_id'] != MY_FS_ID) alert('접근 권한이 없는 체험부스입니다.');
+    }
+
 } else {
     $html_title = '체험부스 등록';
     $row = array(
@@ -34,30 +40,44 @@ include_once('./admin.head.php');
 <input type="hidden" name="bt_id" value="<?php echo $bt_id; ?>">
 <input type="hidden" name="token" value="<?php echo get_admin_token(); ?>">
 
+<?php if ($is_admin != 'super') { ?>
+<input type="hidden" name="fs_id" value="<?php echo defined('MY_FS_ID') ? MY_FS_ID : 0; ?>">
+<?php } ?>
+
 <div class="tbl_frm01 tbl_wrap">
     <table>
         <caption><?php echo $g5['title']; ?></caption>
         <colgroup><col class="grid_4"><col></colgroup>
         <tbody>
 
-        <?php if ($is_admin == 'super') { ?>
         <tr>
             <th scope="row"><label for="fs_id" style="color:#ff3061;">[SaaS] 행사 소속</label></th>
             <td>
-                <select name="fs_id" id="fs_id" class="frm_input">
-                    <option value="0">-- 소속 없음 (미지정) --</option>
-                    <?php
-                    $fs_res = sql_query("SELECT fs_id, fs_name FROM rain_festival ORDER BY fs_id DESC");
-                    while ($fs = sql_fetch_array($fs_res)) {
-                        $selected = ($fs['fs_id'] == $row['fs_id']) ? 'selected' : '';
-                        echo '<option value="'.$fs['fs_id'].'" '.$selected.'>'.get_text($fs['fs_name']).'</option>';
+                <?php if ($is_admin == 'super') { ?>
+                    <select name="fs_id" id="fs_id" class="frm_input">
+                        <option value="0">-- 소속 없음 (미지정) --</option>
+                        <?php
+                        $fs_res = sql_query("SELECT fs_id, fs_name FROM rain_festival ORDER BY fs_id DESC");
+                        while ($fs = sql_fetch_array($fs_res)) {
+                            $selected = ($fs['fs_id'] == $row['fs_id']) ? 'selected' : '';
+                            echo '<option value="'.$fs['fs_id'].'" '.$selected.'>'.get_text($fs['fs_name']).'</option>';
+                        }
+                        ?>
+                    </select>
+                    <span class="frm_info">최고관리자 전용. 부스가 소속될 행사를 지정합니다.</span>
+                <?php } else { 
+                    // [UX 추가] 행사관리자(Lv.8): 수정 불가, 배정된 행사 이름만 강제 노출
+                    $my_fs_name = '미지정';
+                    if (defined('MY_FS_ID') && MY_FS_ID > 0) {
+                        $my_fs = sql_fetch(" SELECT fs_name FROM rain_festival WHERE fs_id = '".MY_FS_ID."' ");
+                        $my_fs_name = get_text($my_fs['fs_name']);
                     }
-                    ?>
-                </select>
-                <span class="frm_info">최고관리자 전용. 부스가 소속될 행사를 지정합니다.</span>
+                ?>
+                    <strong style="font-size:1.1em; color:#000;"><?php echo $my_fs_name; ?></strong>
+                    <span class="frm_info" style="color:#ff3061; margin-left:10px;">※ 관리자님에게 배정된 행사로 자동 고정되며 변경할 수 없습니다.</span>
+                <?php } ?>
             </td>
         </tr>
-        <?php } ?>
 
         <tr><td colspan="2" class="h2_frm">기본 정보</td></tr>
         <tr>

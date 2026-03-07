@@ -78,5 +78,5 @@ if ($w == '') {
     sql_query($sql);
 }
 
-goto_url('./rain_parking_list.php');
+goto_url('./parking_list.php');
 ?>
