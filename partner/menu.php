@@ -22,7 +22,7 @@ if ($act == 'delete' && $rm_id) {
     exit;
 }
 
-// 카테고리 목록 조회aaaaa
+// 카테고리 목록 조회aaaaaaaaa
 $categories = sql_query("
     SELECT DISTINCT rm_category
     FROM rain_restaurant_menu
