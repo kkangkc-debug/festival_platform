@@ -1,5 +1,4 @@
 <?php
-define('_GNUBOARD_', true);
 include_once('./_common.php');
 
 $g5['title'] = '메뉴 관리';

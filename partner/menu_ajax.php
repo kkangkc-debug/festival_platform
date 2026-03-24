@@ -1,5 +1,4 @@
 <?php
-define('_GNUBOARD_', true);
 include_once('./_common.php');
 
 // 파트너 권한 체크
