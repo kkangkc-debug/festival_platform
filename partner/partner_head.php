@@ -6,7 +6,7 @@ if (!defined('_GNUBOARD_')) {
 // 파트너 페이지 전용 헤더 (모바일 최적화)
 $g5_debug['php']['begin_time'] = $begin_time = get_microtime();
 
-// 공통 라이브러리
+// 공통 라이브러리 (config.php 로드되어 G5_PARTNER_PATH 사용 가능)
 require_once G5_PATH . '/head.sub.php';
 
 // 파트너 권한 체크

@@ -1,5 +1,5 @@
 <?php
-define('_GNUBOARD_', true);
+// [수정] define('_GNUBOARD_', true); 코드를 삭제했습니다. (common.php가 알아서 처리합니다)
 include_once('./_common.php');
 
 // 테이블 자동 생성 (없을 경우)
@@ -72,7 +72,6 @@ $recent_orders = sql_query("
 
 <h2 class="page_title">📊 오늘의 현황</h2>
 
-<!-- 오늘 매출 요약 -->
 <div class="card">
     <div class="card_title">오늘의 매출</div>
     <div class="stat_card">
@@ -86,7 +85,6 @@ $recent_orders = sql_query("
     </div>
 </div>
 
-<!-- 주문 상태별 현황 -->
 <div style="display: flex; gap: 10px; margin-bottom: 15px;">
     <div class="card" style="flex: 1; text-align: center;">
         <div class="stat_value" style="color: #1976d2; font-size: 28px;"><?php echo number_format($pending_count); ?></div>
@@ -103,14 +101,12 @@ $recent_orders = sql_query("
 </div>
 
 <?php if ($pending_count > 0) { ?>
-    <!-- 접수 대기 알림 -->
     <div class="alert alert_warning">
         <i class="fa fa-bell"></i> <strong>접수 대기 중인 주문이 <?php echo number_format($pending_count); ?>건 있습니다!</strong>
         <a href="<?php echo G5_PARTNER_URL; ?>/order.php" class="btn btn_primary btn_sm" style="margin-left: 10px;">바로가기</a>
     </div>
 <?php } ?>
 
-<!-- 빠른 기능 -->
 <div class="card">
     <div class="card_title">⚡ 빠른 기능</div>
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
@@ -129,7 +125,6 @@ $recent_orders = sql_query("
     </div>
 </div>
 
-<!-- 상점 정보 -->
 <div class="card">
     <div class="card_title">🏪 내 상점 정보</div>
     <table style="width: 100%; font-size: 13px;">
@@ -166,7 +161,6 @@ $recent_orders = sql_query("
     </table>
 </div>
 
-<!-- 최근 주문 내역 -->
 <div class="card">
     <div class="card_title" style="display: flex; justify-content: space-between; align-items: center;">
         <span>📋 최근 주문</span>
@@ -213,7 +207,6 @@ $recent_orders = sql_query("
     <?php } ?>
 </div>
 
-<!-- 메뉴 관리 빠른 링크 -->
 <div class="card">
     <div class="card_title" style="display: flex; justify-content: space-between; align-items: center;">
         <span>🍽️ 메뉴 관리</span>
