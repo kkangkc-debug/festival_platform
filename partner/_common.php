@@ -1,4 +1,7 @@
 <?php
+if (!defined('_GNUBOARD_')) {
+    define('_GNUBOARD_', true);
+}
 define('G5_IS_PARTNER', true);
 require_once '../common.php';
 
