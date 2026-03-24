@@ -1,5 +1,5 @@
 <?php
-// [수정] define('_GNUBOARD_', true); 코드를 삭제했습니다. (common.php가 알아서 처리합니다)ㅁㅁ
+// [수정] define('_GNUBOARD_', true); 코드를 삭제했습니다. (common.php가 알아서 처리합니다)ㅁㅁsdfsf
 include_once('./_common.php');
 
 // 테이블 자동 생성 (없을 경우)
